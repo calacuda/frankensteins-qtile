@@ -1,0 +1,11 @@
+[discord]
+token = "bot token"
+log-channel = channel id to log to 
+api = weather to start the discord cmd api
+
+[cmds]
+cmds = [
+  "shell-command"
+]
+admins = ["user who can run the command"]
+

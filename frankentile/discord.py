@@ -21,7 +21,7 @@ from .gen_keybinding_img import this_dir as img_dir
 
 
 COMMAND_PREFIX = "/"
-CONFIG_FILE = expanduser("~/.config/qtile/discord.conf")
+CONFIG_FILE = expanduser("~/.config/qtile/discord.toml")
 WALLPAPER_PATH = expanduser("~/.config/qtile/wallpaper")
 _intents = discord.Intents.default()
 _intents.message_content = True
@@ -81,7 +81,7 @@ class Sender:
     async def send_all(self):
         """sends all messages in the queue"""
         headers = {
-            "Authorization": f"Bot {token}", # "Bot {token}"
+            "Authorization": f"Bot {token}",
             "User-Agent": f"FrankenTile (https://discord.com/developers/applications/1134144480979726446/information v0.1)",
             "Content-Type": "application/json"
         }
@@ -197,8 +197,8 @@ async def log(event_type: EventType, payload: dict):
 async def on_ready():
     msg = f'discord bot {CLIENT.user} is now running!'
     logger.info(msg)
-    print(msg)
-    await log(EventType.login, {"message": "Ready to log!"})
+    # print(msg)
+    # await log(EventType.login, {"message": "Ready to log!"})
 
 
 @CLIENT.command(name="get-keybinds")
@@ -275,9 +275,9 @@ async def monitor_change():
 
 async def shutdown():
     """Called before Qtile is shutdown"""
-    logger.warning("shutting down")
+    # logger.warning("shutting down")
     await log(EventType.shutdown, {})
-    await kill_bot()
+    # await kill_bot()
 
 
 async def start_success():
@@ -299,8 +299,8 @@ async def kill_bot():
 def run_discord_bot():
     """runs the discord bot in parallel""" 
     handles = [
+        Process(target=init_sender, args=[QUEUE]),
         Process(target=bot_start, args=()),
-        Process(target=init_sender, args=[QUEUE])
     ]
 
     [h.start() for h in handles]
@@ -321,12 +321,18 @@ async def stop_discord_bot():
     [h.terminate() for h in HANDLES]
 
 
-def init(start_bot=False):
+async def init_logger():
+    await MESSENGER.init_sender(QUEUE)
+    
+
+def init():
     """initializes the discord api. should be called from Qtile's main config.py"""
     # activate/deactivate bot
-    if start_bot:
+    if config.get("discord").get("api"):
         hook.subscribe.startup_once(start_discord_bot)
         hook.subscribe.shutdown(stop_discord_bot)
+    else:
+        hook.subscribe.startup_once(init_logger)
 
     # logging functionality
     hook.subscribe.client_killed(closed_window)
