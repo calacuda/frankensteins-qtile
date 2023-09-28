@@ -1,0 +1,9 @@
+[discord]
+gigs-channel = "gigs-channel id"
+stats_channel = "stats-channel id"
+
+[model]
+upwork = "/path/to/upwork/mopdel"
+
+[upwork]
+url = "rss url"
