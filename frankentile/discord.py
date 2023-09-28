@@ -159,7 +159,7 @@ def bot_start():
     
     try:
         CLIENT.run(token)
-    except exception as e:
+    except Exception as e:
         logger.warning(f"failed to start discord command bot. got error: {e}")
         print(e)
 
