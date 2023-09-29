@@ -42,6 +42,15 @@ def key_binds():
     return send_file(zip_f, download_name="keybinds.zip", as_attachment=True)
 
 
+@app.route("/set-wallpaper", methods=["POST"])
+def set_wallpaper():
+    """takes either an image or a path to an image and setst the wallpaper to it"""
+    # TODO: get image
+    # TODO: set image sym link
+    # TODO: reload configs
+    return "<h1>UNDER CONSTRUCTION</h1>"
+
+
 def _start_api(host, port):
     logger.warning("running web server")
     app.run(host=host, port=port)  # , debug=True, passthrough_errors=True, use_debugger=False, use_reloader=True)
