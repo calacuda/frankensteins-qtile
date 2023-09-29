@@ -17,6 +17,8 @@ import shutil
 import os
 from .gen_keybinding_img import make_imgs 
 from .gen_keybinding_img import this_dir as img_dir
+from .auto_desk_api import set_layout
+
 
 
 COMMAND_PREFIX = "/"
@@ -47,7 +49,7 @@ class QueueIter:
         return not self.queue.empty()
 
     def __len__(self):
-        return len(self.queue)
+    return len(self.queue)
 
     def __iter__(self):
         return self
@@ -217,7 +219,8 @@ async def set_layout(ctx, layout):
     """uses auto-desk to set the layout"""
     await ctx.send(f"attempting to set layout {layout} using auto-desk...")
     # TODO: send layout-load cmd over Unix socket to auto-desk
-    await ctx.send(f"setup layout {layout}.")
+    res = set_layout(layout)
+    await ctx.send(f"setup layout {layout}. auto-desk says {res}")
 
 
 @CLIENT.command(name="set-wallpaper")

@@ -5,18 +5,20 @@ spins up a flask web server to host an api
 """
 
 
-from flask import Flask, send_file
+from flask import Flask, send_file, request
 import zipfile 
 import io
 from .gen_keybinding_img import make_imgs 
 from .gen_keybinding_img import this_dir as img_dir
-from threading import Thread
+from .discord_log import WALLPAPER_PATH
+# from threading import Thread
 import shutil
 from multiprocessing import Process, Queue
 from os.path import expanduser, islink
 import os
 from libqtile import hook
 from libqtile.log_utils import logger
+from .auto_desk_api import set_layout
 
 
 app = Flask("frankentile")
@@ -44,11 +46,24 @@ def key_binds():
 
 @app.route("/set-wallpaper", methods=["POST"])
 def set_wallpaper():
-    """takes either an image or a path to an image and setst the wallpaper to it"""
-    # TODO: get image
-    # TODO: set image sym link
+    """takes a path to an image and sets the wallpaper to it"""
+    path = request.data.get("wallpaper-path")
+
+    if islink(WALLPAPER_PATH):
+        rm(WALLPAPER_PATH)
+        symlink(expanduser(path), WALLPAPER_PATH)
+
     # TODO: reload configs
-    return "<h1>UNDER CONSTRUCTION</h1>"
+
+    return "success"
+
+
+@app.route("/layout/<layout>")
+def load_layout(layout):
+    """uses auto-desk to load the specified layout"""
+    res = set_layout(layout)
+
+    return f"setting layout {layout}. auto-desk says {res}"
 
 
 def _start_api(host, port):
