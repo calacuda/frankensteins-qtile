@@ -19,6 +19,7 @@ import os
 from libqtile import hook
 from libqtile.log_utils import logger
 from .auto_desk_api import set_layout
+from os import remove as rm, symlink
 
 
 app = Flask("frankentile")
@@ -47,7 +48,7 @@ def key_binds():
 @app.route("/set-wallpaper", methods=["POST"])
 def set_wallpaper():
     """takes a path to an image and sets the wallpaper to it"""
-    path = request.data.get("wallpaper-path")
+    path = request.values.get("wallpaper-path")
 
     if islink(WALLPAPER_PATH):
         rm(WALLPAPER_PATH)

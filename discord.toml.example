@@ -1,7 +1,7 @@
 [discord]
-token = "bot token"
-log-channel = channel id to log to 
-api = weather to start the discord cmd api
+token = "bot token"  # the bots token
+log-channel = 123456  # channel id to log to 
+api = false  # weather to start the discord cmd api
 
 [cmds]
 cmds = [

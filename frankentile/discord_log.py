@@ -49,7 +49,7 @@ class QueueIter:
         return not self.queue.empty()
 
     def __len__(self):
-    return len(self.queue)
+        return len(self.queue)
 
     def __iter__(self):
         return self
