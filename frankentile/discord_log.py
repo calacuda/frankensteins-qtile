@@ -8,7 +8,6 @@ from discord.ext import commands
 from discord import Client
 from libqtile.log_utils import logger
 from libqtile import hook
-from libqtile.lazy import lazy
 from enum import Enum
 from os import remove as rm, symlink
 from os.path import expanduser, islink
