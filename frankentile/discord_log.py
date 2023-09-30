@@ -30,6 +30,7 @@ CLIENT = commands.Bot(intents=_intents, command_prefix=COMMAND_PREFIX)
 print(f"global: {CLIENT.status = }")
 HANDLES = None
 
+
 class QueueIter:
     """an iterable wrapper arrounf multiprocessing.Queue"""
     def __init__(self, queue: Queue):
