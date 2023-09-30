@@ -214,13 +214,13 @@ async def get_keybinds(ctx):
     await ctx.send(files=images)
 
 
-@CLIENT.command(name="set-layout")
-async def set_layout(ctx, layout):
-    """uses auto-desk to set the layout"""
-    await ctx.send(f"attempting to set layout {layout} using auto-desk...")
-    # TODO: send layout-load cmd over Unix socket to auto-desk
-    res = set_layout(layout)
-    await ctx.send(f"setup layout {layout}. auto-desk says {res}")
+# @CLIENT.command(name="set-layout")
+# async def set_layout(ctx, layout):
+#     """uses auto-desk to set the layout"""
+#     await ctx.send(f"attempting to set layout {layout} using auto-desk...")
+#     # TODO: send layout-load cmd over Unix socket to auto-desk
+#     res = set_layout(layout)
+#     await ctx.send(f"setup layout {layout}. auto-desk says {res}")
 
 
 @CLIENT.command(name="set-wallpaper")
@@ -238,12 +238,20 @@ async def set_wallpaper(ctx, path):
         ctx.send("set walpaper successfully.")
 
 
+@CLIENT.command(name="auto-desk")
+async def set_wallpaper(ctx, layout):
+    """uses auto tmux to spin up a, auto-desk session"""
+    await ctx.send(f"loading auto-desk layout {layout}")
+    res = set_layout(layout)
+    await ctx.send(f"auto-desk said: `{res}`")
+
+
 @CLIENT.command(name="auto-tmux")
 async def set_wallpaper(ctx, layout):
     """uses auto tmux to spin up a tmux session"""
     await ctx.send(f"loading tmux layout {layout}")
     res = await tmux_layout(layout)
-    await ctx.send(f"auto-tmux said: {res}")
+    await ctx.send(f"auto-tmux said: `{res}`")
 
 
 async def closed_window(win):

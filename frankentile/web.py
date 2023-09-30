@@ -20,6 +20,7 @@ from libqtile import hook
 from libqtile.log_utils import logger
 from .auto_desk_api import set_layout
 from os import remove as rm, symlink
+from .tmux import tmux_layout
 
 
 app = Flask("frankentile")
@@ -45,7 +46,7 @@ def key_binds():
     return send_file(zip_f, download_name="keybinds.zip", as_attachment=True)
 
 
-@app.route("/set-wallpaper", methods=["POST"])
+@app.route("/wallpaper", methods=["POST"])
 def set_wallpaper():
     """takes a path to an image and sets the wallpaper to it"""
     path = request.values.get("wallpaper-path")
@@ -59,12 +60,20 @@ def set_wallpaper():
     return "success"
 
 
-@app.route("/layout/<layout>")
+@app.route("/auto-desk/<layout>")
 def load_layout(layout):
     """uses auto-desk to load the specified layout"""
     res = set_layout(layout)
 
-    return f"setting layout {layout}. auto-desk says {res}"
+    return f"setting auto-desk layout {layout}. auto-desk says: {res}"
+
+
+@app.route("/tmux/<layout>")
+async def tmux(layout):
+    """sets up a tmux layout"""
+    res = await tmux_layout(layout)
+
+    return f"setting up auto-tmux layout {layout}. auto-tmux says: {res}"
 
 
 def _start_api(host, port):
