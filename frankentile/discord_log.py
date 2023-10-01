@@ -5,13 +5,11 @@ import aiohttp
 from libqtile.log_utils import logger
 from libqtile import hook
 from enum import Enum
-import tomllib
 from multiprocessing import Queue
-
 from os.path import expanduser
+from ._discord import config, token
 
 
-CONFIG_FILE = expanduser("~/.config/qtile/discord.toml")
 WALLPAPER_PATH = expanduser("~/.config/qtile/wallpaper")
 
 
@@ -107,16 +105,6 @@ QUEUE = Queue()
 def init_sender(queue):
     """waits for the bot to be connected and then starts sending messages in an iterval"""
     asyncio.run(MESSENGER.init_sender(queue))
-
-
-def read_conf():
-    """reads the config containing tokens and other information"""
-    with open(CONFIG_FILE, "rb") as f:
-        return tomllib.load(f)
-
-
-config = read_conf()
-token = config.get("discord").get("token")
 
 
 class EventType(str, Enum):

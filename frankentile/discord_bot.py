@@ -13,24 +13,14 @@ from .gen_keybinding_img import make_imgs
 from .gen_keybinding_img import this_dir as img_dir
 from .auto_desk_api import set_layout
 from .tmux import tmux_layout
+from ._discord import config, token
 
 
 COMMAND_PREFIX = "/"
-CONFIG_FILE = expanduser("~/.config/qtile/discord.toml")
 WALLPAPER_PATH = expanduser("~/.config/qtile/wallpaper")
 _intents = discord.Intents.default()
 _intents.message_content = True
 CLIENT = commands.Bot(intents=_intents, command_prefix=COMMAND_PREFIX)
-
-
-def read_conf():
-    """reads the config containing tokens and other information"""
-    with open(CONFIG_FILE, "rb") as f:
-        return tomllib.load(f)
-
-
-config = read_conf()
-token = config.get("discord").get("token")
 
 
 def bot_start():
