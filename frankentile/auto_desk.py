@@ -3,7 +3,6 @@
 #####################################
 
 
-
 from libqtile.command.client import InteractiveCommandClient
 from libqtile.log_utils import logger
 from libqtile import hook

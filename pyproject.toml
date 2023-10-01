@@ -7,8 +7,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "frankentile"
-version = "0.2.0"
-description = "a qtile configuration lib that is unnessesary and over the top."  
+version = "0.3.0"
+description = "a qtile configuration lib that is unnecessarily over the top."  
 readme = "README.md"
 authors = [
   { name="Eoghan West", email="eowest@gmail.com" },

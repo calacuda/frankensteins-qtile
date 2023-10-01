@@ -13,7 +13,7 @@ from .gen_keybinding_img import this_dir as img_dir
 from .discord_log import WALLPAPER_PATH
 # from threading import Thread
 import shutil
-from multiprocessing import Process, Queue
+from multiprocessing import Process 
 from os.path import expanduser, islink
 import os
 from libqtile import hook
