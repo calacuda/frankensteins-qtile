@@ -199,8 +199,8 @@ def start_api(host="127.0.0.1", port=8080):
 
 
 def stop_api():
-    if APP_HANDLE:
-        APP_HANDLE.terminate()
+    if API_HANDLE:
+        API_HANDLE.terminate()
 
 
 def init():
