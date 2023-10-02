@@ -1,11 +1,4 @@
 [discord]
 token = "bot token"  # the bots token
 log-channel = 123456  # channel id to log to 
-api = false  # weather to start the discord cmd api
-
-[cmds]
-cmds = [
-  "shell-command"
-]
-admins = ["user who can run the command"]
-
+admins = [ 7890, ]  # a whitelist of users that are allowed to call commands

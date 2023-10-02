@@ -28,6 +28,9 @@ dependencies = [
     "discord",
     "discord",
     "auto-tmux",
+    "pycairo",
+    "PyGObject",
+    "pyalsaaudio",
 ]
 
 [project.urls]
