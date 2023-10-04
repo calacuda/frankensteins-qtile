@@ -10,6 +10,6 @@ Frankenstein's Qtile (frankentile for short) is a library to be used in the conf
 
 ## TODO
 
-- [ ] make a mycroft skill that wraps the web API
-- [ ] setup nebula
+- [x] make a mycroft skill that wraps the web API
+- [x] setup nebula
 - [ ] add grafana logging

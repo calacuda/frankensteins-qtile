@@ -18,7 +18,7 @@ from os.path import expanduser, islink
 import os
 from libqtile import hook
 from libqtile.log_utils import logger
-from .auto_desk_api import set_layout
+from .auto_desk_api import set_layout, find_layout_file
 from os import remove as rm, symlink
 from .tmux import tmux_layout
 from libqtile.command.client import InteractiveCommandClient
@@ -72,16 +72,15 @@ def set_wallpaper():
 @app.route("/auto-desk/layout/<layout>")
 def load_layout(layout):
     """uses auto-desk to load the specified layout"""
-    res = set_layout(layout)
+    # TODO: check for layout in "~/.config/auto-desk/layouts/" (ignore spaces, hyphens, and underscores)
+    layout_name = find_layout_file(layout)
 
-    return f"setting auto-desk layout {layout}. auto-desk says: {res}"
+    if layout_name: 
+        res = set_layout(layout_name)
 
-@app.route("/auto-desk/open-on/<group>", methods=["POST"])
-def open_on(group: str):
-    """opens a .desktop file on group using auto-desk"""
-    return "under construction"
-    # TODO: get desktop file
-    # TODO: launch desktop file on group with auto-desk 
+        return f"setting auto-desk layout {layout}. auto-desk says: {res}"
+    else:
+        return f"unknown layout: {layout}" 
 
 
 @app.route("/tmux/<layout>")
@@ -209,4 +208,14 @@ def init():
 
 
 if __name__ == "__main__":
-    start_app("127.0.0.1", 8080)
+    import argparse
+
+    parser = argparse.ArgumentParser(
+                    prog='frankentile web',
+                    description='starts a web server to control Qtile.',
+                    )
+    parser.add_argument('ip_adr')
+
+    args = parser.parse_args()
+
+    start_app(args.ip_adr, 8080)
