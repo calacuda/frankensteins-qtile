@@ -7,13 +7,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "frankentile"
-version = "0.3.0"
+version = "0.3.1"
 description = "a qtile configuration lib that is unnecessarily over the top."  
 readme = "README.md"
 authors = [
   { name="Eoghan West", email="eowest@gmail.com" },
 ]
-# license = "MIT License"
+license = "MIT License"
 classifiers = [ 
     "Development Status :: 4 - Beta",
     "Intended Audience :: End Users/Desktop",
@@ -26,11 +26,11 @@ classifiers = [
 dependencies = [
     "flask[async]",
     "discord",
-    "discord",
     "auto-tmux",
     "pycairo",
     "PyGObject",
     "pyalsaaudio",
+    "libtmux",
 ]
 
 [project.urls]

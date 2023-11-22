@@ -112,9 +112,10 @@ def clear_desktop(group):
 
 
 def move_window(c):
+    logger.warn(f"moving window")
     wm_class = c.get_wm_class()
     location = get_location(wm_class)
-    logger.debug(f"moving to location, '{location}'")
+    logger.warn(f"moving to location, '{location}'")
     # clear = should_clear(location)
     # if clear:
     #     clear_desktop(location)

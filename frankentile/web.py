@@ -26,9 +26,7 @@ import alsaaudio
 from libqtile.command.base import SelectError, CommandError
 from gi import require_version
 
-require_version('Playerctl', '2.0')
-
-from gi.repository import Playerctl, Gio
+# from gi.repository import Playerctl, Gio
 from gi.repository.GLib import GError
 
 
@@ -120,9 +118,15 @@ def move_to(group: str):
 @app.route("/track/<control>")
 def music(control: str):
     """used to control the music (play/pause/next/etc)"""
-    player = Playerctl.Player()
-
     # TODO: make the play command open a player then play (if no player is open)
+    try:
+        require_version('Playerctl', '2.0')
+    except ValueError as e:
+        return f"setting name space return error: {e}"
+
+    from gi.repository import Playerctl
+
+    player = Playerctl.Player()
 
     controls = {
         "play": player.play, 

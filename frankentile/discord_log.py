@@ -126,6 +126,7 @@ class EventType(str, Enum):
     mouse_attached = "mouse_attached"
     keyboard_detached = "keyboard_detached"
     mouse_detached = "mouse_detached"
+    bat_level_change = "battery"
 
 
 async def send_log(id: int, event_type: EventType, payload: dict):
