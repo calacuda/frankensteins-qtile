@@ -13,7 +13,7 @@ readme = "README.md"
 authors = [
   { name="Eoghan West", email="eowest@gmail.com" },
 ]
-license = "MIT License"
+license = {text: "MIT License"}
 classifiers = [ 
     "Development Status :: 4 - Beta",
     "Intended Audience :: End Users/Desktop",
