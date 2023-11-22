@@ -25,7 +25,7 @@ classifiers = [
 ]
 dependencies = [
     "flask[async]",
-    "discord",
+    "discord.py",
     "auto-tmux",
     "pycairo",
     "PyGObject",
