@@ -11,7 +11,8 @@ from socket import socket, AF_UNIX, SOCK_STREAM
 
 QTILE_CLIENT = InteractiveCommandClient()
 NEW_CLIENT_PIDs = set()
-PATH = "/tmp/desktop-automater"
+# TODO: get this from config file
+PATH = "/tmp/auto-desk"
 
 
 def _open_on(client):
