@@ -7,3 +7,5 @@ import frankentile._discord
 import os
 
 WALLPAPER_PATH = os.path.expanduser("~/.config/qtile/wallpaper")
+
+frankentile.discord_log.no_op()

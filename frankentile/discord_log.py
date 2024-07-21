@@ -2,6 +2,7 @@ import time
 import json
 import asyncio
 import aiohttp
+from aiohttp.hdrs import EXPECT
 from libqtile.log_utils import logger
 from libqtile import hook
 from enum import Enum
@@ -15,6 +16,7 @@ WALLPAPER_PATH = expanduser("~/.config/qtile/wallpaper")
 
 class QueueIter:
     """an iterable wrapper arrounf multiprocessing.Queue"""
+
     def __init__(self, queue: Queue):
         self.queue = queue if queue else Queue()
 
@@ -46,6 +48,7 @@ class QueueIter:
 
 class Sender:
     """a state machine that stores messages to be sent to the discord server and sends them on regular intervals"""
+
     def __init__(self):
         self.connected = False
         self.queue = None
@@ -54,13 +57,39 @@ class Sender:
         """returns true if the bot is connected"""
         return self.connected
 
-    async def _send_one(self, session, headers, payload, url):
-        """helper function that sends a single message. called by send_all."""
-        async with session.post(url, headers=headers, data=payload) as res:
-            text = await res.text()
+    async def is_rate_limited(self, status: int, text: str) -> int:
+        """
+        returns 0 if not rate limited, returns number of seconds untill next
+        message can be sent if ratelimited
+        """
+        if status != 429:
+            return 0
+        else:
+            try:
+                wait_time: int = json.loads(text).get("retry_after", 5)
+                return wait_time
+            except ValueError:
+                return 1
 
-            if res.status != 200:
-                logger.warning(f"status: {res.status}, text: {text}")
+    async def _send_one(self, session, headers, message, id):
+        """helper function that sends a single message. called by send_all."""
+        url = f"https://discord.com/api/v10/channels/{id}/messages"
+        payload = json.dumps({"content": message})
+        not_sent = True
+
+        while not_sent:
+            async with session.post(url, headers=headers, data=payload) as res:
+                text = await res.text()
+                status = res.status
+                rate_limited = await self.is_rate_limited(status, text)
+
+                if rate_limited:
+                    self.queue.append((id, message))
+                    await asyncio.sleep(rate_limited)
+                elif res.status != 200:
+                    logger.warning(f"status: {res.status}, text: {text}")
+                else:
+                    logger.debug(f"sent discord message {text}")
 
     async def send_all(self):
         """sends all messages in the queue"""
@@ -74,9 +103,7 @@ class Sender:
             reqs = []
 
             for id, message in self.queue:
-                url = f"https://discord.com/api/v10/channels/{id}/messages"
-                payload = json.dumps({"content": message})
-                reqs.append(self._send_one(client, headers, payload, url))
+                reqs.append(self._send_one(client, headers, message, id))
 
             await asyncio.gather(*reqs)
 
@@ -103,7 +130,10 @@ QUEUE = Queue()
 
 
 def init_sender(queue):
-    """waits for the bot to be connected and then starts sending messages in an iterval"""
+    """
+    waits for the bot to be connected and then starts sending messages on an
+    iterval
+    """
     asyncio.run(MESSENGER.init_sender(queue))
 
 
@@ -133,11 +163,13 @@ async def send_log(id: int, event_type: EventType, payload: dict):
     """sends a time stamped log to the channel described by id"""
     try:
         text_msg = json.dumps(
-            {"timestamp": time.time(), "event_type": event_type, "payload": payload if payload else None}
+            {"timestamp": time.time(), "event_type": event_type,
+             "payload": payload if payload else None}
         )
     except TypeError as e:
         text_msg = f"JSON encoding error: {e}"
-        logger.error(f"frankentile error in frankentil.discord.send_log(). {text_msg}")
+        logger.error(
+            f"frankentile error in frankentil.discord.send_log(). {text_msg}")
 
     await send_mesg(id, text_msg)
 
@@ -153,7 +185,8 @@ async def log(event_type: EventType, payload: dict):
     try:
         id = config.get("discord").get("log-channel")
     except TypeError as e:
-        logger.error(f"could not find log cahnnel id in config file. expected at: \"discord.log-channel\". got error: {e}")
+        logger.error(
+            f"could not find log cahnnel id in config file. expected at: \"discord.log-channel\". got error: {e}")
     else:
         await send_log(id, event_type, payload)
 
@@ -165,7 +198,11 @@ async def closed_window(win):
     """
     await log(
         EventType.window_closed,
-        {"name": win.name, "wm_class": win.get_wm_class(), "pid": win.get_pid()}
+        {
+            "name": win.name,
+            "wm_class": win.get_wm_class(),
+            "pid": win.get_pid()
+        }
     )
 
 
@@ -173,7 +210,11 @@ async def new_window(win):
     """Called after Qtile starts managing a new client."""
     await log(
         EventType.new_window,
-        {"name": win.name, "wm_class": win.get_wm_class(), "pid": win.get_pid()}
+        {
+            "name": win.name,
+            "wm_class": win.get_wm_class(),
+            "pid": win.get_pid()
+        }
     )
 
 
@@ -186,12 +227,16 @@ async def restart():
 
 
 async def resume():
-    """Called when system wakes up from sleep, suspend or hibernate."""
+    """
+    Called when system wakes up from sleep/suspend or hibernate.
+    """
     await log(EventType.resume, {})
 
 
-async def monitor_change():
-    """Called when the output configuration is changed (e.g. via randr in X11)."""
+async def monitor_change(_event):
+    """
+    Called when the output configuration is changed (e.g. via randr in X11).
+    """
     await log(EventType.mon_change, {})
 
 
@@ -217,7 +262,9 @@ async def init_logger():
 
 
 def init():
-    """initializes the discord api. should be called from Qtile's main config.py"""
+    """
+    initializes the discord api. should be called from Qtile's main config.py
+    """
     hook.subscribe.startup_once(init_logger)
     hook.subscribe.client_killed(closed_window)
     hook.subscribe.client_managed(new_window)
@@ -227,3 +274,8 @@ def init():
     hook.subscribe.shutdown(shutdown)
     hook.subscribe.startup_complete(start_success)
     hook.subscribe.startup_once(login)
+
+
+def no_op():
+    """a no-op ftion to make the linter happy"""
+    pass
