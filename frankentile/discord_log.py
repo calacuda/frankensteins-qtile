@@ -57,7 +57,7 @@ class Sender:
         """returns true if the bot is connected"""
         return self.connected
 
-    async def is_rate_limited(self, status: int, text: str) -> int:
+    def is_rate_limited(self, status: int, text: str) -> int:
         """
         returns 0 if not rate limited, returns number of seconds untill next
         message can be sent if ratelimited
@@ -67,29 +67,34 @@ class Sender:
         else:
             try:
                 wait_time: int = json.loads(text).get("retry_after", 5)
+
                 return wait_time
             except ValueError:
-                return 1
+                return 0
 
     async def _send_one(self, session, headers, message, id):
         """helper function that sends a single message. called by send_all."""
         url = f"https://discord.com/api/v10/channels/{id}/messages"
         payload = json.dumps({"content": message})
-        not_sent = True
+        # not_sent = True
 
-        while not_sent:
-            async with session.post(url, headers=headers, data=payload) as res:
-                text = await res.text()
-                status = res.status
-                rate_limited = await self.is_rate_limited(status, text)
+        # while not_sent:
+        async with session.post(url, headers=headers, data=payload) as res:
+            text = await res.text()
+            status = res.status
+            rate_limited = self.is_rate_limited(status, text)
 
-                if rate_limited:
-                    self.queue.append((id, message))
-                    await asyncio.sleep(rate_limited)
-                elif res.status != 200:
-                    logger.warning(f"status: {res.status}, text: {text}")
-                else:
-                    logger.debug(f"sent discord message {text}")
+            if rate_limited:
+                logger.warning(f"getting rate limited! => {text}")
+                # this must not be an async wait. bc ALL message sending must
+                # hault on rate_limit
+                time.sleep(rate_limited * 1.2)
+                self.queue.append((id, message))
+                return
+            elif res.status != 200:
+                logger.warning(f"status: {res.status}, text: {text}")
+            else:
+                logger.debug(f"sent discord message {text}")
 
     async def send_all(self):
         """sends all messages in the queue"""

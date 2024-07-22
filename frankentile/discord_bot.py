@@ -43,7 +43,7 @@ def admin_only(func):
 
 def bot_start():
     logger.warning("starting discord command bot")
-    
+
     try:
         CLIENT.run(token)
     except Exception as e:
@@ -68,7 +68,8 @@ async def get_keybinds(ctx):
     except FileNotFoundError:
         pass
 
-    images = [discord.File(img) for img in make_imgs(config_path=expanduser("~/.config/qtile/config.py"))]
+    images = [discord.File(img) for img in make_imgs(
+        config_path=expanduser("~/.config/qtile/config.py"))]
     await ctx.send(files=images)
 
 
@@ -76,15 +77,15 @@ async def get_keybinds(ctx):
 @CLIENT.command(name="set-wallpaper")
 async def set_wallpaper(ctx, path):
     """sets the Qtile wallpaper in a semi-permanent fassion"""
-    # TODO: add ability to send an image via discord and have this function download it, 
+    # TODO: add ability to send an image via discord and have this function download it,
     # save it to ~/.config/qtile/discord_wallpapers/image_name, save the image_name in a log,
     # and finally sent wallpaper to it.
     await ctx.send(f"setting walpaper to {path}")
-    
+
     if islink(WALLPAPER_PATH) and isfile(expanduser(path)):
         rm(WALLPAPER_PATH)
         symlink(expanduser(path), WALLPAPER_PATH)
-        ctx.send("set walpaper successfully.") 
+        ctx.send("set walpaper successfully.")
     else:
         ctx.send("[FAILED] either the requested file doesn't exist, or the wallpaper is a file not a symlink. (more likely the former)")
 
@@ -138,15 +139,26 @@ async def open_on(ctx, program: str, wm_class: str, desktop_name: str):
     # desktop_file, tmp = cmd.split(".desktop ")
     # wm_class, desktop_name = tmp.split(" ")
     # if not admin_user(ctx.author):
-        # wait ctx.send("not an authorized user")
+    # wait ctx.send("not an authorized user")
 
     # if not program.endswith(".desktop"):
     #     await ctx.send("can't launch arbetrary files. must be a `.desktop` file")
     #     return
-    
+
     res = send(f"open-on {program} {wm_class} {desktop_name}")
 
     await ctx.send(f"auto-desk said: {res}")
+
+
+@admin_only
+@CLIENT.command(name="battery")
+async def get_bat(ctx):
+    """returns the charge percentage of the battery"""
+    import psutil
+
+    battery = psutil.sensors_battery()
+
+    await ctx.send(f"battery at {battery.percent:.1f}%")
 
 
 if __name__ == "__main__":
