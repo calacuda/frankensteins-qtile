@@ -16,7 +16,7 @@ PATH = "/tmp/auto-desk"
 
 
 def _open_on(client):
-    """used to move windows when they open""" 
+    """used to move windows when they open"""
     pid = client.get_pid()
 
     # this function gets called twice per window opening.
@@ -85,13 +85,15 @@ def send_auto_desk(message):
             pass
         else:
             s.send(bytes(message, "utf-8"))
-            s.shutdown(1)  # tells the server im done sending data and it can reply now.
+            # tells the server im done sending data and it can reply now.
+            s.shutdown(1)
             res = s.recv(1024)
             ec = res[0]
             if len(res) >= 3:
                 location = res[2:].decode('utf-8')
             if ec:
-                logger.error(f"got error code from auto-desk on message '{message}'.")
+                logger.error(
+                    f"got error code from auto-desk on message '{message}'.")
 
     return location
 
@@ -102,21 +104,21 @@ def clear_desktop(group):
     # for group in tmp_clears:
     if group:
         # windows = [w["id"]
-                # for w in QTILE_CLIENT.windows() if w["group"] == group]
+        # for w in QTILE_CLIENT.windows() if w["group"] == group]
         windows = QTILE_CLIENT.group[group].windows()
         logger.info(f"about to clear windows from group '{group}'")
         for wid in windows:
             QTILE_CLIENT.window[wid].togroup("hidden")
         logger.info(f"cleared group '{group}'")
     else:
-        logger.info(f"not clearing group '{group}'")            
+        logger.info(f"not clearing group '{group}'")
 
 
 def move_window(c):
-    logger.warn(f"moving window")
+    logger.warning("moving window")
     wm_class = c.get_wm_class()
     location = get_location(wm_class)
-    logger.warn(f"moving to location, '{location}'")
+    logger.warning(f"moving to location, '{location}'")
     # clear = should_clear(location)
     # if clear:
     #     clear_desktop(location)
