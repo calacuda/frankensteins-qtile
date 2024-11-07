@@ -6,14 +6,14 @@ spins up a flask web server to host an api
 
 
 from flask import Flask, send_file, request
-import zipfile 
+import zipfile
 import io
-from .gen_keybinding_img import make_imgs 
+from .gen_keybinding_img import make_imgs
 from .gen_keybinding_img import this_dir as img_dir
 from .discord_log import WALLPAPER_PATH
 # from threading import Thread
 import shutil
-from multiprocessing import Process 
+from multiprocessing import Process
 from os.path import expanduser, islink
 import os
 from libqtile import hook
@@ -73,12 +73,12 @@ def load_layout(layout):
     # TODO: check for layout in "~/.config/auto-desk/layouts/" (ignore spaces, hyphens, and underscores)
     layout_name = find_layout_file(layout)
 
-    if layout_name: 
+    if layout_name:
         res = set_layout(layout_name)
 
         return f"setting auto-desk layout {layout}. auto-desk says: {res}"
     else:
-        return f"unknown layout: {layout}" 
+        return f"unknown layout: {layout}"
 
 
 @app.route("/tmux/<layout>")
@@ -93,7 +93,7 @@ async def tmux(layout):
 def focus_on(group: str):
     """changes active focus to the specified group"""
     c = InteractiveCommandClient()
-    
+
     try:
         c.group[group].toscreen()
     except SelectError:
@@ -106,13 +106,13 @@ def focus_on(group: str):
 def move_to(group: str):
     """move current window to group"""
     c = InteractiveCommandClient()
-    
+
     try:
         c.window.togroup(group)
     except CommandError:
         return "no group by that name"
     else:
-        return "window moved" 
+        return "window moved"
 
 
 @app.route("/track/<control>")
@@ -129,7 +129,7 @@ def music(control: str):
     player = Playerctl.Player()
 
     controls = {
-        "play": player.play, 
+        "play": player.play,
         "pause": player.pause,
         "play-pause": player.play_pause,
         "next": player.next,
@@ -155,12 +155,12 @@ def volume(cmd):
     m = alsaaudio.Mixer()
     vol = m.getvolume()
     vol = int(vol[0])
-        
+
     volumes = {
         "up": vol + 5,
         "down": vol - 5,
         "mute": 0,
-        }
+    }
 
     new_vol = volumes.get(cmd)
 
@@ -190,7 +190,8 @@ def config_reload():
 
 def start_app(host, port):
     logger.warning("running web server")
-    app.run(host=host, port=port)  # , debug=True, passthrough_errors=True, use_debugger=False, use_reloader=True)
+    # , debug=True, passthrough_errors=True, use_debugger=False, use_reloader=True)
+    app.run(host=host, port=port)
 
 
 def start_api(host="127.0.0.1", port=8080):
@@ -215,9 +216,9 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(
-                    prog='frankentile web',
-                    description='starts a web server to control Qtile.',
-                    )
+        prog='frankentile web',
+        description='starts a web server to control Qtile.',
+    )
     parser.add_argument('ip_adr')
 
     args = parser.parse_args()
